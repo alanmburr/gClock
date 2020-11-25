@@ -1,0 +1,59 @@
+#!/usr/bin/python3
+'''
+    Copyright (C) 2020  Alan Burr
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+'''
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GObject, Gio, GLib
+import time
+
+class MainWindow(Gtk.Window):
+	def __init__(self):
+		Gtk.Window.__init__(self, title="Clock")
+		Gtk.Window.set_default_icon_name("gnome-clocks")
+		self.box = Gtk.Box(spacing=6)
+		self.add(self.box)
+
+		hb = Gtk.HeaderBar()
+		hb.set_show_close_button(True)
+		hb.props.title = "gClock"
+		hb.props.subtitle = "(xclock reimagined)"
+		hb.set_decoration_layout(":close")
+		self.set_titlebar(hb)
+
+		self.label = Gtk.Label()
+		self.box.pack_start(self.label, True, True, 0)
+
+	# Displays Timer
+	def displayclock(self):
+		#  putting our datetime into a var and setting our label to the result. 
+		#  we need to return "True" to ensure the timer continues to run, otherwise it will only run once.
+		datetimenow = str(time.strftime('%m/%d/%Y%n%I:%M:%S %p'))
+		self.label.set_markup("<span size=\"xx-large\" weight=\"bold\">"+datetimenow+"</span>")
+		return True
+
+	# Initialize Timer
+	def startclocktimer(self):
+		#  this takes 2 args: (how often to update in millisec, the method to run)
+		GLib.timeout_add(1000, self.displayclock)
+
+
+win = MainWindow()
+win.connect("destroy", Gtk.main_quit)
+win.show_all()
+win.startclocktimer()
+Gtk.main()
